@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Text, FlatList, KeyboardAvoidingView, Platform, SafeAreaView, Image, TouchableOpacity, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -16,6 +16,7 @@ export default function ChatScreen() {
   const { colors, theme } = useTheme();
   const router = useRouter();
   const flatListRef = useRef<FlatList>(null);
+  const [userScrolled, setUserScrolled] = useState(false);
   
   // Find the persona
   const persona = PERSONAS.find(p => p.id === personaId);
@@ -26,19 +27,31 @@ export default function ChatScreen() {
     }
   }, [personaId, loadMessages]);
   
-  // Scroll to bottom when new messages arrive
+  // Scroll to bottom only for new messages and if user hasn't scrolled up
   useEffect(() => {
-    if (messages.length > 0 && flatListRef.current) {
+    if (messages.length > 0 && flatListRef.current && !userScrolled) {
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, 100);
     }
-  }, [messages]);
+  }, [messages, userScrolled]);
   
+  // Reset userScrolled when a new message is sent
   const handleSendMessage = async (content: string) => {
     if (personaId) {
+      setUserScrolled(false); // Reset scroll state when user sends a message
       await sendMessage(content, personaId);
     }
+  };
+  
+  // Handle scroll events
+  const handleScroll = () => {
+    setUserScrolled(true);
+  };
+  
+  // Handle scroll to end
+  const handleScrollToEndReached = () => {
+    setUserScrolled(false);
   };
   
   const handleClearChat = async () => {
@@ -57,6 +70,7 @@ export default function ChatScreen() {
               text: "Clear", 
               onPress: async () => {
                 await clearChat(personaId);
+                setUserScrolled(false); // Reset scroll state when chat is cleared
               },
               style: "destructive"
             }
@@ -122,6 +136,18 @@ export default function ChatScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <ChatBubble message={item} />}
           contentContainerStyle={styles.messageList}
+          onScroll={handleScroll}
+          onMomentumScrollEnd={(event) => {
+            // Check if scrolled to the end
+            const contentHeight = event.nativeEvent.contentSize.height;
+            const layoutHeight = event.nativeEvent.layoutMeasurement.height;
+            const scrollY = event.nativeEvent.contentOffset.y;
+            
+            // If we're at the bottom (with a small threshold for rounding errors)
+            if (scrollY + layoutHeight >= contentHeight - 20) {
+              handleScrollToEndReached();
+            }
+          }}
           ListHeaderComponent={
             <View style={styles.header}>
               <Image 
@@ -138,6 +164,18 @@ export default function ChatScreen() {
             isTyping ? <TypingIndicator /> : null
           }
         />
+        
+        {userScrolled && messages.length > 0 && (
+          <TouchableOpacity 
+            style={[styles.scrollToBottomButton, { backgroundColor: colors.primary }]}
+            onPress={() => {
+              flatListRef.current?.scrollToEnd({ animated: true });
+              setUserScrolled(false);
+            }}
+          >
+            <Ionicons name="arrow-down" size={20} color="#FFFFFF" />
+          </TouchableOpacity>
+        )}
         
         <ChatInput 
           onSendMessage={handleSendMessage}
@@ -191,5 +229,20 @@ const styles = StyleSheet.create({
   clearText: {
     color: '#FF3B30',
     fontSize: 17,
+  },
+  scrollToBottomButton: {
+    position: 'absolute',
+    right: 16,
+    bottom: 80,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 }); 
