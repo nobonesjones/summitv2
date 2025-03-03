@@ -1,24 +1,114 @@
-import React from 'react';
-import { StyleSheet, View, Text, ScrollView, SafeAreaView } from 'react-native';
-import { useAuth } from '../../../contexts/AuthContext';
-import { useTheme } from '../../../contexts/ThemeContext';
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, Image, SafeAreaView, ScrollView } from 'react-native';
+import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { PERSONAS } from '../../../constants/personas';
-import PersonaCard from '../../../components/home/PersonaCard';
+import { useTheme } from '../../../contexts/ThemeContext';
+
+interface MentorCardProps {
+  name: string;
+  description: string;
+  avatarSource: any;
+  isSelected: boolean;
+  onSelect: () => void;
+}
+
+const MentorCard: React.FC<MentorCardProps> = ({ 
+  name, 
+  description, 
+  avatarSource, 
+  isSelected,
+  onSelect 
+}) => {
+  return (
+    <TouchableOpacity 
+      style={[styles.mentorCard, isSelected && styles.selectedMentorCard]} 
+      onPress={onSelect}
+    >
+      <View style={styles.mentorAvatarContainer}>
+        <Image source={avatarSource} style={styles.mentorAvatar} />
+      </View>
+      <View style={styles.mentorInfo}>
+        <Text style={styles.mentorName}>{name}</Text>
+        <Text style={styles.mentorDescription}>{description}</Text>
+      </View>
+      {isSelected && (
+        <View style={styles.selectedIndicator}>
+          <Text style={styles.selectedIndicatorText}>✓</Text>
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+};
 
 export default function HomeScreen() {
-  const { user } = useAuth();
+  const router = useRouter();
   const { colors } = useTheme();
+  const [selectedPersonaId, setSelectedPersonaId] = useState<string | null>(null);
+
+  const handleStartChat = () => {
+    if (selectedPersonaId) {
+      router.push(`/chat/${selectedPersonaId}`);
+    }
+  };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={[styles.title, { color: colors.text }]}>Summit AI Chat</Text>
-        <Text style={[styles.subtitle, { color: colors.subtext }]}>Choose an AI persona to chat with</Text>
-        
-        {PERSONAS.map((persona) => (
-          <PersonaCard key={persona.id} persona={persona} />
-        ))}
+        {/* Top section with app icon and welcome message */}
+        <View style={styles.headerContainer}>
+          <View style={styles.iconContainer}>
+            <LinearGradient
+              colors={['#FF57B6', '#A054FF', '#5B61FF']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.iconGradient}
+            >
+              <Text style={styles.iconText}>S</Text>
+            </LinearGradient>
+          </View>
+          <Text style={styles.welcomeText}>Welcome Back</Text>
+        </View>
+
+        {/* Create New Plan Card */}
+        <View style={styles.newPlanCard}>
+          <Text style={styles.newPlanTitle}>Create New Plan</Text>
+          <Text style={styles.newPlanDescription}>Select your mentor and click start.</Text>
+        </View>
+
+        {/* Mentor Cards */}
+        <View style={styles.mentorsContainer}>
+          {PERSONAS.map((persona) => (
+            <MentorCard 
+              key={persona.id}
+              name={persona.name.split(' ')[0]} // Just use the first name
+              description={persona.description}
+              avatarSource={persona.image}
+              isSelected={selectedPersonaId === persona.id}
+              onSelect={() => setSelectedPersonaId(persona.id)}
+            />
+          ))}
+        </View>
       </ScrollView>
+
+      {/* Start Button */}
+      <TouchableOpacity 
+        style={[
+          styles.startButtonContainer, 
+          !selectedPersonaId && styles.startButtonDisabled
+        ]}
+        onPress={handleStartChat}
+        disabled={!selectedPersonaId}
+      >
+        <LinearGradient
+          colors={['#70A2FF', '#C28AFF', '#FF85D2']}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          style={styles.startButton}
+        >
+          <Text style={styles.startButtonText}>Start</Text>
+        </LinearGradient>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -26,19 +116,127 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#121212',
   },
   scrollContent: {
-    padding: 20,
+    padding: 16,
+    paddingBottom: 80, // Add padding for the start button
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 24,
-    textAlign: 'center',
+  },
+  iconContainer: {
+    marginRight: 12,
+  },
+  iconGradient: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconText: {
+    fontSize: 24,
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  welcomeText: {
+    fontSize: 22,
+    fontWeight: '600',
+    color: 'white',
+  },
+  newPlanCard: {
+    backgroundColor: '#1E1E1E',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
+  newPlanTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: 'white',
+    marginBottom: 4,
+  },
+  newPlanDescription: {
+    fontSize: 14,
+    color: '#AAAAAA',
+  },
+  mentorsContainer: {
+    marginBottom: 24,
+  },
+  mentorCard: {
+    backgroundColor: '#1E1E1E',
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  selectedMentorCard: {
+    borderColor: '#5B61FF',
+  },
+  mentorAvatarContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    backgroundColor: '#2A2A2A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    overflow: 'hidden',
+  },
+  mentorAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+  },
+  mentorInfo: {
+    flex: 1,
+  },
+  mentorName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'white',
+    marginBottom: 2,
+  },
+  mentorDescription: {
+    fontSize: 14,
+    color: '#AAAAAA',
+  },
+  selectedIndicator: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#5B61FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  selectedIndicatorText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  startButtonContainer: {
+    position: 'absolute',
+    bottom: 24,
+    left: 16,
+    right: 16,
+  },
+  startButtonDisabled: {
+    opacity: 0.5,
+  },
+  startButton: {
+    height: 50,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  startButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'white',
   },
 }); 
