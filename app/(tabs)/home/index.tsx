@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PERSONAS } from '../../../constants/personas';
 import { useTheme } from '../../../contexts/ThemeContext';
+import { Ionicons } from '@expo/vector-icons';
 
 interface MentorCardProps {
   name: string;
@@ -52,19 +53,28 @@ export default function HomeScreen() {
     }
   };
 
+  const navigateToSettings = () => {
+    router.push('/(tabs)/settings');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Top section with app icon and welcome message */}
+        {/* Top section with app icon, welcome message, and settings icon */}
         <View style={styles.headerContainer}>
-          <View style={styles.iconContainer}>
-            <Image 
-              source={require('../../../assets/images/icon.png')} 
-              style={styles.appIcon} 
-              resizeMode="contain"
-            />
+          <View style={styles.leftHeader}>
+            <View style={styles.iconContainer}>
+              <Image 
+                source={require('../../../assets/images/icon.png')} 
+                style={styles.appIcon} 
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={styles.welcomeText}>Welcome Back</Text>
           </View>
-          <Text style={styles.welcomeText}>Welcome Back</Text>
+          <TouchableOpacity onPress={navigateToSettings} style={styles.settingsButton}>
+            <Ionicons name="person-outline" size={24} color="white" />
+          </TouchableOpacity>
         </View>
 
         {/* Create New Plan Card */}
@@ -123,6 +133,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 24,
+    justifyContent: 'space-between',
+  },
+  leftHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   iconContainer: {
     marginRight: 12,
@@ -139,6 +154,14 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '600',
     color: 'white',
+  },
+  settingsButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#1E1E1E',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   newPlanCard: {
     backgroundColor: '#1E1E1E',

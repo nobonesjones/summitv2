@@ -5,6 +5,7 @@ import { useTheme } from '../../../contexts/ThemeContext';
 import { useRouter } from 'expo-router';
 import ThemeToggle from '../../../components/settings/ThemeToggle';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function SettingsScreen() {
   const { user, logout } = useAuth();
@@ -32,11 +33,23 @@ export default function SettingsScreen() {
     }
   };
 
+  const navigateBack = () => {
+    router.back();
+  };
+
   return (
     <ScrollView 
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.contentContainer}
     >
+      <View style={styles.header}>
+        <TouchableOpacity onPress={navigateBack} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
+        <View style={styles.headerRight} />
+      </View>
+
       <View style={styles.profileSection}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Profile</Text>
         <Text style={[styles.email, { color: colors.subtext }]}>{user?.email}</Text>
@@ -89,6 +102,28 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    justifyContent: 'space-between',
+  },
+  backButton: {
+    padding: 5,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  headerRight: {
+    width: 40,
+    height: 40,
   },
   profileSection: {
     marginBottom: 30,
