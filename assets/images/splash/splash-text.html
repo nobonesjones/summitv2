@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Summit AI Splash Screen</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #1E1E1E;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    .splash-container {
+      width: 1242px;
+      height: 2436px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #1E1E1E;
+      position: relative;
+    }
+    .splash-text {
+      font-size: 120px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    }
+    .instructions {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+      z-index: 100;
+    }
+    .download-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <div class="instructions">
+    <h3>Instructions:</h3>
+    <p>1. Take a screenshot of this page</p>
+    <p>2. Save it as splash.png in the assets/images folder</p>
+    <p>3. Update app.json to use this image</p>
+  </div>
+  
+  <button class="download-btn" id="download-btn">Download as Image</button>
+  
+  <div class="splash-container" id="splash-container">
+    <div class="splash-text">SUMMIT AI</div>
+  </div>
+
+  <script>
+    document.getElementById('download-btn').addEventListener('click', function() {
+      // Use html2canvas to capture the splash container
+      alert('To download: Take a screenshot of this page, then crop and save it as splash.png');
+    });
+  </script>
+</body>
+</html> 
