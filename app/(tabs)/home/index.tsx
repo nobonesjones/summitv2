@@ -58,14 +58,11 @@ export default function HomeScreen() {
         {/* Top section with app icon and welcome message */}
         <View style={styles.headerContainer}>
           <View style={styles.iconContainer}>
-            <LinearGradient
-              colors={['#FF57B6', '#A054FF', '#5B61FF']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.iconGradient}
-            >
-              <Text style={styles.iconText}>S</Text>
-            </LinearGradient>
+            <Image 
+              source={require('../../../assets/images/icon.png')} 
+              style={styles.appIcon} 
+              resizeMode="contain"
+            />
           </View>
           <Text style={styles.welcomeText}>Welcome Back</Text>
         </View>
@@ -129,18 +126,14 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     marginRight: 12,
-  },
-  iconGradient: {
     width: 40,
     height: 40,
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    overflow: 'hidden',
   },
-  iconText: {
-    fontSize: 24,
-    color: 'white',
-    fontWeight: 'bold',
+  appIcon: {
+    width: 40,
+    height: 40,
   },
   welcomeText: {
     fontSize: 22,
