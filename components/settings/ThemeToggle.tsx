@@ -8,8 +8,15 @@ interface ThemeToggleProps {
 }
 
 const ThemeToggle: React.FC<ThemeToggleProps> = ({ containerStyle }) => {
-  const { theme, toggleTheme, colors } = useTheme();
+  const { theme, toggleTheme, setTheme, colors } = useTheme();
   const isDarkMode = theme === 'dark';
+
+  const handleToggle = () => {
+    console.log('ThemeToggle: handleToggle called, current theme:', theme);
+    const newTheme = isDarkMode ? 'light' : 'dark';
+    console.log('Setting theme to:', newTheme);
+    setTheme(newTheme);
+  };
 
   return (
     <TouchableOpacity 
@@ -18,7 +25,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ containerStyle }) => {
         { borderBottomColor: colors.border },
         containerStyle
       ]} 
-      onPress={toggleTheme}
+      onPress={handleToggle}
       activeOpacity={0.7}
     >
       <View style={styles.labelContainer}>
@@ -34,10 +41,11 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ containerStyle }) => {
       </View>
       <Switch
         value={isDarkMode}
-        onValueChange={toggleTheme}
+        onValueChange={handleToggle}
         trackColor={{ false: '#E0E0E0', true: '#333333' }}
         thumbColor={isDarkMode ? colors.primary : '#FFFFFF'}
         ios_backgroundColor={isDarkMode ? '#333333' : '#E0E0E0'}
+        testID="theme-toggle-switch"
       />
     </TouchableOpacity>
   );
